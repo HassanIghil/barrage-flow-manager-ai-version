@@ -62,9 +62,9 @@ CREATE TABLE Cooperative (
 -- =====================================================
 CREATE TABLE Demande_Irrigation (
     id_demande INT PRIMARY KEY AUTO_INCREMENT,
-    date_demande DATETIME NOT NULL,
+    date_demande DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     volume_demande DECIMAL(15,2) NOT NULL,
-    statut ENUM('en_attente', 'approuvee', 'refusee', 'en_cours', 'terminee') NOT NULL,
+    statut ENUM('en_attente', 'approuvee', 'refusee', 'en_cours', 'terminee') NOT NULL DEFAULT 'en_attente',
     id_user INT NOT NULL,
     id_coop INT NOT NULL,
 
