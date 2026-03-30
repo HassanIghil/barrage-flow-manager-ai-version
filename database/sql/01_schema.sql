@@ -1,62 +1,70 @@
 -- =====================================================
--- 1. TABLE BARRAGE
+-- BARRAGE FLOW MANAGER - AI VERSION
+-- Script basé sur le MPD dbdiagram.io (image fournie)
+-- =====================================================
+
+-- 1. CREATE DATABASE
+-- =====================================================
+CREATE DATABASE IF NOT EXISTS barrage_flow_manager_ai_version 
+    CHARACTER SET utf8mb4 
+    COLLATE utf8mb4_unicode_ci;
+
+USE barrage_flow_manager_ai_version;
+
+-- =====================================================
+-- 2. TABLE BARRAGE
 -- =====================================================
 CREATE TABLE Barrage (
     id_barrage INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(50) NOT NULL,
-    capacite_max DECIMAL(15,2) NOT NULL CHECK (capacite_max > 0),
-    niveau_actuel DECIMAL(15,2) NOT NULL CHECK (niveau_actuel >= 0),
-    seuil_critique DECIMAL(15,2) NOT NULL CHECK (seuil_critique >= 0),
-    
+    capacite_max DECIMAL(15,2) NOT NULL,
+    niveau_actuel DECIMAL(15,2) NOT NULL,
+    seuil_critique DECIMAL(15,2) NOT NULL,
+
     INDEX idx_barrage_nom (nom),
-    INDEX idx_barrage_niveau (niveau_actuel),
-    
-    CONSTRAINT chk_niveau_valid CHECK (niveau_actuel <= capacite_max)
+    INDEX idx_barrage_niveau (niveau_actuel)
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 2. TABLE UTILISATEUR
+-- 3. TABLE UTILISATEUR
 -- =====================================================
 CREATE TABLE Utilisateur (
     id_user INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
-    role ENUM('admin', 'gestionnaire', 'agriculteur', 'technicien') 
-        NOT NULL DEFAULT 'agriculteur',
-    
+    role ENUM('admin', 'gestionnaire', 'agriculteur', 'technicien') NOT NULL,
+
     INDEX idx_user_role (role)
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 3. TABLE COOPERATIVE
+-- 4. TABLE COOPERATIVE
 -- =====================================================
 CREATE TABLE Cooperative (
     id_coop INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(50) NOT NULL,
-    surface_agricole DECIMAL(15,2) NOT NULL CHECK (surface_agricole > 0),
-    historique_consommation DECIMAL(15,2) NOT NULL DEFAULT 0 
-        CHECK (historique_consommation >= 0),
-    
+    surface_agricole DECIMAL(15,2) NOT NULL,
+    historique_consommation DECIMAL(15,2),
+
     INDEX idx_coop_nom (nom)
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 4. TABLE DEMANDE_IRRIGATION
+-- 5. TABLE DEMANDE_IRRIGATION
 -- =====================================================
 CREATE TABLE Demande_Irrigation (
     id_demande INT PRIMARY KEY AUTO_INCREMENT,
-    date_demande DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    volume_demande DECIMAL(15,2) NOT NULL CHECK (volume_demande > 0),
-    statut ENUM('en_attente', 'approuvee', 'refusee', 'en_cours', 'terminee') 
-        NOT NULL DEFAULT 'en_attente',
+    date_demande DATETIME NOT NULL,
+    volume_demande DECIMAL(15,2) NOT NULL,
+    statut ENUM('en_attente', 'approuvee', 'refusee', 'en_cours', 'terminee') NOT NULL,
     id_user INT NOT NULL,
     id_coop INT NOT NULL,
-    
+
     CONSTRAINT fk_demande_user 
         FOREIGN KEY (id_user) REFERENCES Utilisateur(id_user),
     CONSTRAINT fk_demande_coop 
         FOREIGN KEY (id_coop) REFERENCES Cooperative(id_coop),
-    
+
     INDEX idx_demande_date (date_demande),
     INDEX idx_demande_user (id_user),
     INDEX idx_demande_coop (id_coop),
@@ -64,26 +72,24 @@ CREATE TABLE Demande_Irrigation (
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 5. TABLE LACHER_EAU
+-- 6. TABLE LACHER_EAU
 -- =====================================================
 CREATE TABLE Lacher_Eau (
     id_lacher INT PRIMARY KEY AUTO_INCREMENT,
-    date_lacher DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    volume DECIMAL(15,2) NOT NULL CHECK (volume > 0),
-    statut ENUM('planifie', 'en_cours', 'termine', 'annule') 
-        NOT NULL DEFAULT 'planifie',
+    date_lacher DATETIME NOT NULL,
+    volume DECIMAL(15,2) NOT NULL,
+    statut ENUM('planifie', 'en_cours', 'termine', 'annule') NOT NULL,
     id_demande INT,
     id_user INT NOT NULL,
     id_barrage INT NOT NULL,
-    
+
     CONSTRAINT fk_lacher_demande 
-        FOREIGN KEY (id_demande) REFERENCES Demande_Irrigation(id_demande) 
-        ON DELETE SET NULL,
+        FOREIGN KEY (id_demande) REFERENCES Demande_Irrigation(id_demande),
     CONSTRAINT fk_lacher_user 
         FOREIGN KEY (id_user) REFERENCES Utilisateur(id_user),
     CONSTRAINT fk_lacher_barrage 
         FOREIGN KEY (id_barrage) REFERENCES Barrage(id_barrage),
-    
+
     INDEX idx_lacher_date (date_lacher),
     INDEX idx_lacher_statut (statut),
     INDEX idx_lacher_user (id_user),
@@ -91,20 +97,19 @@ CREATE TABLE Lacher_Eau (
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 6. TABLE ALERTE
+-- 7. TABLE ALERTE
 -- =====================================================
 CREATE TABLE Alerte (
     id_alerte INT PRIMARY KEY AUTO_INCREMENT,
-    type_alerte ENUM('niveau_critique', 'seuil_bas', 'inondation_risque', 'maintenance', 'systeme') NOT NULL DEFAULT 'systeme',
+    type ENUM('niveau_critique', 'seuil_bas', 'inondation_risque', 'maintenance', 'systeme') NOT NULL,
     message VARCHAR(500) NOT NULL,
-    date_alerte DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_ DATETIME NOT NULL,
     id_barrage INT NOT NULL,
-    
+
     CONSTRAINT fk_alerte_barrage 
-        FOREIGN KEY (id_barrage) REFERENCES Barrage(id_barrage) 
-        ON DELETE CASCADE,
-    
-    INDEX idx_alerte_date (date_alerte),
-    INDEX idx_alerte_type (type_alerte),
-    INDEX idx_alerte_barrage_date (id_barrage, date_alerte)
+        FOREIGN KEY (id_barrage) REFERENCES Barrage(id_barrage),
+
+    INDEX idx_alerte_date (date_),
+    INDEX idx_alerte_type (type),
+    INDEX idx_alerte_barrage_date (id_barrage, date_)
 ) ENGINE=InnoDB;
