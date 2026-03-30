@@ -116,7 +116,7 @@ CREATE TABLE Alerte (
     id_barrage INT NOT NULL,
 
     CONSTRAINT fk_alerte_barrage 
-        FOREIGN KEY (id_barrage) REFERENCES Barrage(id_barrage),
+        FOREIGN KEY (id_barrage) REFERENCES Barrage(id_barrage) ON DELETE CASCADE,
 
     INDEX idx_alerte_date (date_),
     INDEX idx_alerte_type (type),
