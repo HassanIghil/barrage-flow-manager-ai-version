@@ -63,6 +63,6 @@ VALUES
 -- 1 critique, 1 warning (seuil_bas), 1 info (systeme)
 INSERT INTO Alerte (type, message, date_, id_barrage) 
 VALUES 
-('niveau_critique', 'Niveau d\'eau critique atteint - Seuil de securite approchant', '2024-03-20 03:45:00', 1),
+('niveau_critique', 'Niveau d''eau critique atteint - Seuil de securite approchant', '2024-03-20 03:45:00', 1),
 ('seuil_bas', 'Niveau d\'eau bas - Reduction recommandee des lachers planifies', '2024-03-18 08:00:00', 1),
 ('systeme', 'Maintenance programmee des vannes le 25/03/2024', '2024-03-15 10:00:00', 1);
