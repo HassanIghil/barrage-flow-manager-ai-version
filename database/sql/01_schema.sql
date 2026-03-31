@@ -15,6 +15,30 @@ CREATE TABLE Barrage (
 ) ENGINE=InnoDB;
 
 -- =====================================================
+-- 8. TABLE REPARTITION
+-- =====================================================
+CREATE TABLE Repartition (
+    id_repartition INT PRIMARY KEY AUTO_INCREMENT,
+    id_lacher INT NOT NULL,
+    id_coop INT NOT NULL,
+    volume_attribue DECIMAL(15,2) NOT NULL,
+
+    CONSTRAINT fk_rep_lacher
+        FOREIGN KEY (id_lacher) REFERENCES Lacher_Eau(id_lacher)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_rep_coop
+        FOREIGN KEY (id_coop) REFERENCES Cooperative(id_coop)
+        ON DELETE CASCADE,
+
+    -- éviter doublons (important)
+    CONSTRAINT unique_lacher_coop UNIQUE (id_lacher, id_coop),
+
+    INDEX idx_rep_lacher (id_lacher),
+    INDEX idx_rep_coop (id_coop)
+) ENGINE=InnoDB;
+
+-- =====================================================
 -- 2. TABLE UTILISATEUR
 -- =====================================================
 CREATE TABLE Utilisateur (
