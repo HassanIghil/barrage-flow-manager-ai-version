@@ -4,7 +4,7 @@
 -- Données de test (Seed Data) - Compatible MPD Original
 -- =====================================================
 
-USE barrage_flow_manager_ai_version;
+-- The database to use must be selected by the caller (no hardcoded USE here).
 
 -- =====================================================
 -- 1. INSERT BARRAGE
