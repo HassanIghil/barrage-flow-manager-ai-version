@@ -1,4 +1,5 @@
 # backend/app/main.py
+from app.routes import auth, users
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +18,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
+app.include_router(users.router)
 
 @app.get("/")
 def root():
