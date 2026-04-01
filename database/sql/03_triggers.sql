@@ -29,10 +29,12 @@ CREATE TRIGGER trg_after_lacher_update_niveau
 AFTER INSERT ON Lacher_Eau
 FOR EACH ROW
 BEGIN
-    -- Mise à jour du niveau en utilisant les noms de colonnes du schéma 
-    UPDATE Barrage 
-    SET niveau_actuel = niveau_actuel - NEW.volume 
-    WHERE id_barrage = NEW.id_barrage;
+    -- Mise à jour du niveau uniquement si le lacher est 'termine'
+    IF NEW.statut = 'termine' THEN
+        UPDATE Barrage 
+        SET niveau_actuel = niveau_actuel - NEW.volume 
+        WHERE id_barrage = NEW.id_barrage;
+    END IF;
 END //
 
 DELIMITER ;
