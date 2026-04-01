@@ -1,13 +1,18 @@
 # backend/app/main.py
-from app.routes import auth, users
+from app.routes import auth, users, dashboard, alerts
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+app = FastAPI(
+    title="Barrage Flow Manager API",
+    description="API REST pour la gestion et la supervision du barrage.",
+    version="1.0.0",
+)
 
 origins = [
     "http://localhost:5173",  # frontend (Vite)
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
@@ -20,6 +25,8 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(dashboard.router)
+app.include_router(alerts.router)
 
 @app.get("/")
 def root():
