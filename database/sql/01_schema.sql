@@ -45,7 +45,6 @@ CREATE TABLE Utilisateur (
 
     INDEX idx_user_role (role)
 ) ENGINE=InnoDB;
-
 -- =====================================================
 -- 4. TABLE COOPERATIVE
 -- =====================================================

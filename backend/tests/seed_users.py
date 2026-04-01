@@ -15,7 +15,7 @@ users = [
         nom="Mohamed Benali",
         email="directeur@barrage.ma",
         password=hash_password("123456"),
-        role=UserRole.admin
+        role=UserRole.Directeur
     ),
     User(
         nom="Fatima El Amrani",
