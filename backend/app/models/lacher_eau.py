@@ -26,3 +26,4 @@ class LacherEau(Base):
     demande = relationship("DemandeIrrigation", back_populates="lachers_eau")
     utilisateur = relationship("User", back_populates="lachers_eau")
     barrage = relationship("Barrage", back_populates="lachers_eau")
+    repartitions = relationship("Repartition", back_populates="lacher_eau")

@@ -5,12 +5,12 @@
 
 -- 1. CREATE DATABASE
 -- =====================================================
-CREATE DATABASE IF NOT EXISTS barrage_flow_db 
+CREATE DATABASE IF NOT EXISTS barrage_flow_db_AI_Version 
     CHARACTER SET utf8mb4 
     COLLATE utf8mb4_unicode_ci;
 
-USE barrage_flow_db;
-
+USE barrage_flow_db_AI_Version;
+    
 -- =====================================================
 -- 2. TABLE BARRAGE
 -- =====================================================
@@ -34,41 +34,17 @@ CREATE TABLE Barrage (
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 8. TABLE REPARTITION
--- =====================================================
-CREATE TABLE Repartition (
-    id_repartition INT PRIMARY KEY AUTO_INCREMENT,
-    id_lacher INT NOT NULL,
-    id_coop INT NOT NULL,
-    volume_attribue DECIMAL(15,2) NOT NULL,
-
-    CONSTRAINT fk_rep_lacher
-        FOREIGN KEY (id_lacher) REFERENCES Lacher_Eau(id_lacher)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_rep_coop
-        FOREIGN KEY (id_coop) REFERENCES Cooperative(id_coop)
-        ON DELETE CASCADE,
-
-    -- éviter doublons (important)
-    CONSTRAINT unique_lacher_coop UNIQUE (id_lacher, id_coop),
-
-    INDEX idx_rep_lacher (id_lacher),
-    INDEX idx_rep_coop (id_coop)
-) ENGINE=InnoDB;
-
--- =====================================================
--- 2. TABLE UTILISATEUR
+-- 3. TABLE UTILISATEUR
 -- =====================================================
 CREATE TABLE Utilisateur (
     id_user INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'gestionnaire', 'agriculteur', 'technicien') NOT NULL DEFAULT 'agriculteur',
 
     INDEX idx_user_role (role)
 ) ENGINE=InnoDB;
+
 -- =====================================================
 -- 4. TABLE COOPERATIVE
 -- =====================================================
@@ -145,4 +121,28 @@ CREATE TABLE Alerte (
     INDEX idx_alerte_date (date_),
     INDEX idx_alerte_type (type),
     INDEX idx_alerte_barrage_date (id_barrage, date_)
+) ENGINE=InnoDB;
+
+-- =====================================================
+-- 8. TABLE REPARTITION
+-- =====================================================
+CREATE TABLE Repartition (
+    id_repartition INT PRIMARY KEY AUTO_INCREMENT,
+    id_lacher INT NOT NULL,
+    id_coop INT NOT NULL,
+    volume_attribue DECIMAL(15,2) NOT NULL,
+
+    CONSTRAINT fk_rep_lacher
+        FOREIGN KEY (id_lacher) REFERENCES Lacher_Eau(id_lacher)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_rep_coop
+        FOREIGN KEY (id_coop) REFERENCES Cooperative(id_coop)
+        ON DELETE CASCADE,
+
+    -- éviter doublons (important)
+    CONSTRAINT unique_lacher_coop UNIQUE (id_lacher, id_coop),
+
+    INDEX idx_rep_lacher (id_lacher),
+    INDEX idx_rep_coop (id_coop)
 ) ENGINE=InnoDB;
