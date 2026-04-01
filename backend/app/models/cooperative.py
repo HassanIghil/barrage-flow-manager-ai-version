@@ -13,4 +13,5 @@ class Cooperative(Base):
     historique_consommation = Column(Numeric(15, 2), nullable=True)
     
     # Relationships
-    demandes_irrigation = relationship("DemandeIrrigation", back_populates="cooperative")
+    demandes = relationship("DemandeIrrigation", back_populates="cooperative")
+    repartitions = relationship("Repartition", back_populates="cooperative")

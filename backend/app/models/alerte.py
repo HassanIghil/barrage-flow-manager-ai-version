@@ -16,9 +16,9 @@ class Alerte(Base):
     __tablename__ = "Alerte"
     
     id_alerte = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    type = Column(Enum(AlerteType), nullable=False, default=AlerteType.SYSTEME)
+    type = Column(Enum('niveau_critique', 'seuil_bas', 'inondation_risque', 'maintenance', 'systeme'), nullable=False)
     message = Column(String(500), nullable=False)
-    date_ = Column(DateTime, nullable=False)
+    date_ = Column(DateTime, nullable=False, default=func.now())
     id_barrage = Column(Integer, ForeignKey("Barrage.id_barrage"), nullable=False)
     
     # Relationships
