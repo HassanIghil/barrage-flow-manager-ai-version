@@ -34,35 +34,7 @@ CREATE TABLE Barrage (
 ) ENGINE=InnoDB;
 
 -- =====================================================
-<<<<<<< HEAD
--- 8. TABLE REPARTITION
--- =====================================================
-CREATE TABLE Repartition (
-    id_repartition INT PRIMARY KEY AUTO_INCREMENT,
-    id_lacher INT NOT NULL,
-    id_coop INT NOT NULL,
-    volume_attribue DECIMAL(15,2) NOT NULL,
-
-    CONSTRAINT fk_rep_lacher
-        FOREIGN KEY (id_lacher) REFERENCES Lacher_Eau(id_lacher)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_rep_coop
-        FOREIGN KEY (id_coop) REFERENCES Cooperative(id_coop)
-        ON DELETE CASCADE,
-
-    -- éviter doublons (important)
-    CONSTRAINT unique_lacher_coop UNIQUE (id_lacher, id_coop),
-
-    INDEX idx_rep_lacher (id_lacher),
-    INDEX idx_rep_coop (id_coop)
-) ENGINE=InnoDB;
-
--- =====================================================
--- 2. TABLE UTILISATEUR
-=======
 -- 3. TABLE UTILISATEUR
->>>>>>> main
 -- =====================================================
 CREATE TABLE Utilisateur (
     id_user INT PRIMARY KEY AUTO_INCREMENT,
@@ -138,17 +110,17 @@ CREATE TABLE Lacher_Eau (
 -- =====================================================
 CREATE TABLE Alerte (
     id_alerte INT PRIMARY KEY AUTO_INCREMENT,
-    type ENUM('niveau_critique', 'seuil_bas', 'inondation_risque', 'maintenance', 'systeme') NOT NULL,
+    type_alerte ENUM('niveau_critique', 'seuil_bas', 'inondation_risque', 'maintenance', 'systeme') NOT NULL,
     message VARCHAR(500) NOT NULL,
-    date_ DATETIME NOT NULL,
+    date_alerte DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     id_barrage INT NOT NULL,
 
     CONSTRAINT fk_alerte_barrage 
         FOREIGN KEY (id_barrage) REFERENCES Barrage(id_barrage) ON DELETE CASCADE,
 
-    INDEX idx_alerte_date (date_),
-    INDEX idx_alerte_type (type),
-    INDEX idx_alerte_barrage_date (id_barrage, date_)
+    INDEX idx_alerte_date (date_alerte),
+    INDEX idx_alerte_type (type_alerte),
+    INDEX idx_alerte_barrage_date (id_barrage, date_alerte)
 ) ENGINE=InnoDB;
 
 -- =====================================================
