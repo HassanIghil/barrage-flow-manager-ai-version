@@ -17,12 +17,12 @@ VALUES
 -- 2. INSERT UTILISATEURS (4 utilisateurs)
 -- =====================================================
 -- 1 Directeur (admin), 2 Ingénieurs (gestionnaire), 1 Opérateur (technicien)
-INSERT INTO Utilisateur (nom, email, role) 
+INSERT INTO Utilisateur (nom, email, password, role) 
 VALUES 
-('Mohamed Benali', 'directeur@barrage.ma', 'admin'),
-('Fatima El Amrani', 'ingenieur1@barrage.ma', 'gestionnaire'),
-('Karim Ouazzani', 'ingenieur2@barrage.ma', 'gestionnaire'),
-('Ahmed Tahiri', 'operateur@barrage.ma', 'technicien');
+('Mohamed Benali', 'directeur@barrage.ma', 'password123', 'admin'),
+('Fatima El Amrani', 'ingenieur1@barrage.ma', 'password123', 'gestionnaire'),
+('Karim Ouazzani', 'ingenieur2@barrage.ma', 'password123', 'gestionnaire'),
+('Ahmed Tahiri', 'operateur@barrage.ma', 'password123', 'technicien');
 
 -- =====================================================
 -- 3. INSERT COOPÉRATIVES AGRICOLES (5 coopératives Souss-Massa)
