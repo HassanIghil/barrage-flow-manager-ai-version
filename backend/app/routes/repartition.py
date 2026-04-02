@@ -13,6 +13,57 @@ from app.schemas.repartition import RepartitionCreate, RepartitionUpdate, Repart
 router = APIRouter(prefix="/api/repartitions", tags=["Repartition"])
 
 
+@router.get("/v/detail", response_model=List[dict])
+def get_repartition_view_detail(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Retourne les détails des répartitions depuis la vue : v_repartition_detail
+    """
+    try:
+        result = db.execute(text("SELECT * FROM v_repartition_detail"))
+        rows = result.fetchall()
+        return [dict(row._mapping) for row in rows]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur base de données : {str(e)}")
+
+
+@router.post("/trigger/{id_lacher}", status_code=status.HTTP_200_OK)
+def trigger_repartition_procedure(
+    id_lacher: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Exécute la procédure stockée sp_repartir_eau pour un lâcher donné.
+    Ceci calcule et insère automatiquement les répartitions au prorata des surfaces.
+    """
+    try:
+        # On vérifie si des répartitions existent déjà pour éviter les doublons 
+        # (La procédure SQL fait des INSERT bruts, elle pourrait échouer sur clé unique si gérée)
+        existing = db.execute(
+            text("SELECT 1 FROM Repartition WHERE id_lacher = :id LIMIT 1"),
+            {"id": id_lacher}
+        ).fetchone()
+        
+        if existing:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Des répartitions existent déjà pour le lâcher #{id_lacher}"
+            )
+
+        db.execute(text("CALL sp_repartir_eau(:id)"), {"id": id_lacher})
+        db.commit()
+        
+        return {"message": f"Répartition générée avec succès pour le lâcher #{id_lacher}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erreur lors de l'exécution : {str(e)}")
+
+
 @router.get("/", response_model=List[dict])
 def list_repartitions(
     id_lacher: int = None,

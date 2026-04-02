@@ -19,10 +19,10 @@ VALUES
 -- 1 Directeur (admin), 2 Ingénieurs (gestionnaire), 1 Opérateur (technicien)
 INSERT INTO Utilisateur (nom, email, password, role) 
 VALUES 
-('Mohamed Benali', 'directeur@barrage.ma', 'password123', 'admin'),
-('Fatima El Amrani', 'ingenieur1@barrage.ma', 'password123', 'gestionnaire'),
-('Karim Ouazzani', 'ingenieur2@barrage.ma', 'password123', 'gestionnaire'),
-('Ahmed Tahiri', 'operateur@barrage.ma', 'password123', 'technicien');
+('Mohamed Benali', 'directeur@barrage.ma', '$2b$12$3li8hjndiISEckEDcqDiPe044ruPd0qA9EhfUr5gXjTupNDTocWey', 'admin'),
+('Fatima El Amrani', 'ingenieur1@barrage.ma', '$2b$12$3li8hjndiISEckEDcqDiPe044ruPd0qA9EhfUr5gXjTupNDTocWey', 'gestionnaire'),
+('Karim Ouazzani', 'ingenieur2@barrage.ma', '$2b$12$3li8hjndiISEckEDcqDiPe044ruPd0qA9EhfUr5gXjTupNDTocWey', 'gestionnaire'),
+('Ahmed Tahiri', 'operateur@barrage.ma', '$2b$12$3li8hjndiISEckEDcqDiPe044ruPd0qA9EhfUr5gXjTupNDTocWey', 'technicien');
 
 -- =====================================================
 -- 3. INSERT COOPÉRATIVES AGRICOLES (5 coopératives Souss-Massa)

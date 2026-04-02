@@ -6,10 +6,10 @@ from app.core.database import Base
 import enum
 
 class LacherStatus(str, enum.Enum):
-    PLANIFIE = "planifie"
-    EN_COURS = "en_cours"
-    TERMINE = "termine"
-    ANNULE = "annule"
+    planifie = "planifie"  
+    en_cours = "en_cours"
+    termine = "termine"
+    annule = "annule"
 
 class LacherEau(Base):
     __tablename__ = "Lacher_Eau"
@@ -17,7 +17,7 @@ class LacherEau(Base):
     id_lacher = Column(Integer, primary_key=True, index=True, autoincrement=True)
     date_lacher = Column(DateTime, nullable=False)
     volume = Column(Numeric(15, 2), nullable=False)
-    statut = Column(Enum(LacherStatus), nullable=False, default=LacherStatus.PLANIFIE)
+    statut = Column(Enum(LacherStatus), nullable=False, default=LacherStatus.planifie)
     id_demande = Column(Integer, ForeignKey("Demande_Irrigation.id_demande"), nullable=True)
     id_user = Column(Integer, ForeignKey("Utilisateur.id_user"), nullable=False)
     id_barrage = Column(Integer, ForeignKey("Barrage.id_barrage"), nullable=False)

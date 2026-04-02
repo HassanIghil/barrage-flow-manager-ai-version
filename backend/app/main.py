@@ -1,5 +1,5 @@
 # backend/app/main.py
-from app.routes import auth, users, dashboard, alerts
+from app.routes import auth, users, dashboard, alerts, lacher_eau
 from app.routes import repartition
 
 from fastapi import FastAPI
@@ -29,6 +29,7 @@ app.include_router(users.router)
 app.include_router(dashboard.router)
 app.include_router(alerts.router)
 app.include_router(repartition.router)
+app.include_router(lacher_eau.router)
 
 @app.get("/")
 def root():

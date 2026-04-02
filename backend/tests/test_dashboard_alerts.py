@@ -218,6 +218,69 @@ def test_alerts_critical_only_critical_type(auth_headers):
     print(f"\n✅ {len(data)} alerte(s) critique(s) — tous les types sont 'niveau_critique'")
 
 
+# ─────────────────────────────────────────────
+# Tests : Repartition (Vue et Procédure)
+# ─────────────────────────────────────────────
+
+def test_repartition_view_status_ok(auth_headers):
+    """La route de la vue v_repartition_detail retourne HTTP 200."""
+    response = client.get("/api/repartitions/v/detail", headers=auth_headers)
+    assert response.status_code == 200
+    print(f"\n✅ /api/repartitions/v/detail → HTTP {response.status_code}")
+
+
+def test_repartition_view_structure(auth_headers):
+    """Vérifie la structure des données retournées par la vue v_repartition_detail."""
+    response = client.get("/api/repartitions/v/detail", headers=auth_headers)
+    assert response.status_code == 200
+    data = response.json()
+    
+    if not data:
+        pytest.skip("Aucune répartition en base — vérifiez 02_seed_data.sql")
+        
+    entry = data[0]
+    # Champs de la vue v_repartition_detail
+    assert "date_lacher" in entry
+    assert "volume_total" in entry
+    assert "nom_cooperative" in entry
+    assert "volume_attribue_m3" in entry
+    assert "surface_hectares" in entry
+    print(f"\n✅ Structure v_repartition_detail correcte (Ex: {entry['nom_cooperative']})")
+
+
+def test_repartition_trigger_procedure(auth_headers):
+    """
+    Teste l'exécution de la procédure sp_repartir_eau via l'API.
+    On utilise l'id_lacher=3 (planifié dans seed_data, sans répartition).
+    """
+    id_lacher = 3
+
+    # --- NETTOYAGE PRÉALABLE ---
+    # On supprime les répartitions existantes pour ce lâcher (cas où le test est relancé)
+    # pour garantir un état propre au démarrage de l'assertion.
+    check_init = client.get(f"/api/repartitions/?id_lacher={id_lacher}", headers=auth_headers)
+    if check_init.status_code == 200:
+        for rep in check_init.json():
+            client.delete(f"/api/repartitions/{rep['id_repartition']}", headers=auth_headers)
+
+    # 1. On vérifie maintenant qu'il n'y a plus de répartition pour ce lâcher
+    check = client.get(f"/api/repartitions/?id_lacher={id_lacher}", headers=auth_headers)
+    assert check.status_code == 200
+    assert len(check.json()) == 0
+
+    # 2. On déclenche la procédure
+    response = client.post(f"/api/repartitions/trigger/{id_lacher}", headers=auth_headers)
+    assert response.status_code == 200
+    assert "message" in response.json()
+    print(f"\n✅ Procédure sp_repartir_eau exécutée pour #{id_lacher}")
+
+    # 3. On vérifie que les données ont été créées
+    check_again = client.get(f"/api/repartitions/?id_lacher={id_lacher}", headers=auth_headers)
+    assert check_again.status_code == 200
+    assert len(check_again.json()) > 0
+    print(f"✅ {len(check_again.json())} lignes de répartition créées pour #{id_lacher}")
+
+
 if __name__ == "__main__":
     import pytest as _pytest
     raise SystemExit(_pytest.main([__file__, "-v", "-s"]))
