@@ -22,6 +22,8 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(dashboard.router)
 app.include_router(alerts.router)
+from app.routes import releases
+app.include_router(releases.router)
 
 @app.get("/")
 def root():

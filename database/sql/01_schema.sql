@@ -40,6 +40,7 @@ CREATE TABLE Utilisateur (
     id_user INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'gestionnaire', 'agriculteur', 'technicien') NOT NULL DEFAULT 'agriculteur',
 
     INDEX idx_user_role (role)

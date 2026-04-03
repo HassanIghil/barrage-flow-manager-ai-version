@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/users", tags=["Users"])
 @router.post(
     "/register",
     response_model=UserResponse,
-    dependencies=[Depends(RoleChecker(["Directeur"]))]
+    dependencies=[Depends(RoleChecker(["Directeur", "admin", "Admin"]))]
 )
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
 

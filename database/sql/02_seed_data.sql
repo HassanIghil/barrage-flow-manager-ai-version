@@ -17,12 +17,12 @@ VALUES
 -- 2. INSERT UTILISATEURS (4 utilisateurs)
 -- =====================================================
 -- 1 Directeur (admin), 2 Ingénieurs (gestionnaire), 1 Opérateur (technicien)
-INSERT INTO Utilisateur (nom, email, role) 
+INSERT INTO Utilisateur (nom, email, password, role) 
 VALUES 
-('Mohamed Benali', 'directeur@barrage.ma', 'admin'),
-('Fatima El Amrani', 'ingenieur1@barrage.ma', 'gestionnaire'),
-('Karim Ouazzani', 'ingenieur2@barrage.ma', 'gestionnaire'),
-('Ahmed Tahiri', 'operateur@barrage.ma', 'technicien');
+('Mohamed Benali', 'directeur@barrage.ma', 'password', 'admin'),
+('Fatima El Amrani', 'ingenieur1@barrage.ma', 'password', 'gestionnaire'),
+('Karim Ouazzani', 'ingenieur2@barrage.ma', 'password', 'gestionnaire'),
+('Ahmed Tahiri', 'operateur@barrage.ma', 'password', 'technicien');
 
 -- =====================================================
 -- 3. INSERT COOPÉRATIVES AGRICOLES (5 coopératives Souss-Massa)
@@ -61,8 +61,28 @@ VALUES
 -- 6. INSERT ALERTES (3 alertes)
 -- =====================================================
 -- 1 critique, 1 warning (seuil_bas), 1 info (systeme)
-INSERT INTO Alerte (type, message, date_, id_barrage) 
+INSERT INTO Alerte (type_alerte, message, date_alerte, id_barrage) 
 VALUES 
 ('niveau_critique', 'Niveau d''eau critique atteint - Seuil de securite approchant', '2024-03-20 03:45:00', 1),
-('seuil_bas', 'Niveau d\'eau bas - Reduction recommandee des lachers planifies', '2024-03-18 08:00:00', 1),
+('seuil_bas', 'Niveau eau bas - Reduction recommandee des lachers planifies', '2024-03-18 08:00:00', 1),
 ('systeme', 'Maintenance programmee des vannes le 25/03/2024', '2024-03-15 10:00:00', 1);
+
+-- =====================================================
+-- 7. INSERT REPARTITION
+-- =====================================================
+-- Distribution proportionnelle par surface agricole (surface totale = 1956.50 ha)
+-- Lacher 1 (id_lacher=1, volume=50000 m³, statut='termine')
+INSERT INTO Repartition (id_lacher, id_coop, volume_attribue)
+VALUES
+(1, 1, 11511.11),  -- Coop Tamaloute    450.50 ha → 23.03%
+(1, 2,  8196.44),  -- Coop El Firdaous  320.75 ha → 16.39%
+(1, 3, 14827.74),  -- Coop Oued Souss   580.00 ha → 29.65%
+(1, 4,  5373.55),  -- Coop Al Amal      210.25 ha → 10.75%
+(1, 5, 10091.16),  -- Coop Targa        395.00 ha → 20.19%
+
+-- Lacher 2 (id_lacher=2, volume=75000 m³, statut='termine')
+(2, 1, 17266.67),  -- Coop Tamaloute    450.50 ha
+(2, 2, 12294.65),  -- Coop El Firdaous  320.75 ha
+(2, 3, 22241.62),  -- Coop Oued Souss   580.00 ha
+(2, 4,  8060.33),  -- Coop Al Amal      210.25 ha
+(2, 5, 15136.73);  -- Coop Targa        395.00 ha
