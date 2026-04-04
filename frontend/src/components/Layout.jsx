@@ -4,17 +4,25 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Users,
   Waves,
 } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
-const links = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/releases", label: "Releases", icon: Waves },
-  { to: "/alerts", label: "Alerts", icon: Bell },
-];
+function buildLinks(role) {
+  const isDirecteur = role?.toLowerCase() === "directeur" || role?.toLowerCase() === "admin";
+  const links = [
+    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/releases", label: "Releases", icon: Waves },
+    { to: "/alerts", label: "Alerts", icon: Bell },
+  ];
+  if (isDirecteur) {
+    links.push({ to: "/users", label: "Agents", icon: Users });
+  }
+  return links;
+}
 
 function NavItem({ to, label, icon: Icon, onClick }) {
   return (
@@ -39,6 +47,8 @@ function NavItem({ to, label, icon: Icon, onClick }) {
 export default function Layout() {
   const [open, setOpen] = useState(false);
   const { role, logout, userEmail } = useAuth();
+
+  const links = buildLinks(role);
 
   return (
     <div className="min-h-screen text-ink">
@@ -65,7 +75,19 @@ export default function Layout() {
             ))}
           </nav>
 
-          <div className="mt-8 rounded-3xl bg-lagoon p-5 text-white">
+          {/* Role indicator */}
+          {(role?.toLowerCase() === "directeur" || role?.toLowerCase() === "admin") && (
+            <div className="mt-6 rounded-2xl bg-lagoon/10 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lagoon">
+                {role?.toLowerCase() === "admin" ? "Admin" : "Directeur"}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Accès complet activé
+              </p>
+            </div>
+          )}
+
+          <div className="mt-6 rounded-3xl bg-lagoon p-5 text-white">
             <p className="text-sm uppercase tracking-[0.2em] text-white/70">
               Tailwind test
             </p>
