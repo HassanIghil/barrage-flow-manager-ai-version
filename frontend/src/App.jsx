@@ -4,6 +4,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
+import ReleasesPage from "./pages/ReleasesPage";
+import AlertsPage from "./pages/AlertsPage";
+import UnauthorizedPage from "./pages/UnauthorizedPage";
 
 export default function App() {
   return (
@@ -18,8 +21,29 @@ export default function App() {
         }
       >
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/profile" element={<Profile />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/releases"
+          element={
+            <ProtectedRoute
+              allowedRoles={["Directeur", "Gestionnaire", "Technicien", "admin", "Admin", "gestionnaire", "technicien"]}
+            >
+              <ReleasesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/alerts"
+          element={
+            <ProtectedRoute
+              allowedRoles={["Directeur", "Technicien", "admin", "Admin", "technicien"]}
+            >
+              <AlertsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

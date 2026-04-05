@@ -7,3 +7,4 @@ from .cooperative import CooperativeCreate, CooperativeResponse
 from .demande_irrigation import DemandeIrrigationCreate, DemandeIrrigationResponse
 from .alerte import AlerteCreate, AlerteResponse
 from .dashboard import DashboardResponse
+from .repartition import RepartitionCreate, RepartitionUpdate, RepartitionResponse

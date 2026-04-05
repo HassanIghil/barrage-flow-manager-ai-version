@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.user import UserCreate, UserResponse
@@ -12,10 +12,9 @@ router = APIRouter(prefix="/api/users", tags=["Users"])
 @router.post(
     "/register",
     response_model=UserResponse,
-    dependencies=[Depends(RoleChecker(["Directeur", "admin", "Admin"]))]
+    dependencies=[Depends(RoleChecker(["Directeur", "admin", "Admin"]))],
 )
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
-
     existing = db.query(User).filter(User.email == user_data.email).first()
 
     if existing:
@@ -24,8 +23,8 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     user = User(
         nom=user_data.nom,
         email=user_data.email,
-        password=hash_password(user_data.password),  # ✅ hash
-        role=user_data.role
+        password=hash_password(user_data.password),
+        role=user_data.role,
     )
 
     db.add(user)
@@ -37,7 +36,6 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserResponse)
 def me(payload: dict = Depends(get_current_user), db: Session = Depends(get_db)):
-
     email = payload.get("sub")
 
     user = db.query(User).filter(User.email == email).first()

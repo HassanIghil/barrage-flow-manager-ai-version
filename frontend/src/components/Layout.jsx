@@ -1,7 +1,22 @@
-import { BarChart3, Droplets, LogOut, Menu, UserCircle2 } from "lucide-react";
+import {
+  BarChart3,
+  Bell,
+  Droplets,
+  LogOut,
+  Menu,
+  UserCircle2,
+  Waves,
+} from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+
+const links = [
+  { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
+  { to: "/releases", label: "Releases", icon: Waves },
+  { to: "/alerts", label: "Alerts", icon: Bell },
+  { to: "/profile", label: "Profil", icon: UserCircle2 },
+];
 
 function NavItem({ to, label, icon: Icon, onClick }) {
   return (
@@ -25,7 +40,7 @@ function NavItem({ to, label, icon: Icon, onClick }) {
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
-  const { logout, user } = useAuth();
+  const { logout, user, role } = useAuth();
   const location = useLocation();
 
   const pageMeta = {
@@ -33,9 +48,21 @@ export default function Layout() {
       eyebrow: "Tableau de bord",
       title: "Vue d'ensemble du barrage",
     },
+    "/releases": {
+      eyebrow: "Operations",
+      title: "Gestion des lachers",
+    },
+    "/alerts": {
+      eyebrow: "Surveillance",
+      title: "Alertes critiques",
+    },
     "/profile": {
       eyebrow: "Profil",
       title: "Profil utilisateur",
+    },
+    "/unauthorized": {
+      eyebrow: "Securite",
+      title: "Acces refuse",
     },
   };
 
@@ -64,18 +91,9 @@ export default function Layout() {
           </div>
 
           <nav className="space-y-2">
-            <NavItem
-              to="/dashboard"
-              label="Dashboard"
-              icon={BarChart3}
-              onClick={() => setOpen(false)}
-            />
-            <NavItem
-              to="/profile"
-              label="Profil"
-              icon={UserCircle2}
-              onClick={() => setOpen(false)}
-            />
+            {links.map((link) => (
+              <NavItem key={link.to} {...link} onClick={() => setOpen(false)} />
+            ))}
           </nav>
         </aside>
 
@@ -110,8 +128,8 @@ export default function Layout() {
                 <p className="text-xs uppercase tracking-[0.25em] text-lagoon">
                   Connecte
                 </p>
-                <p className="text-sm font-semibold">{user?.nom || "Agent"}</p>
-                <p className="text-xs text-slate-500">{user?.email}</p>
+                <p className="text-sm font-semibold">{user?.nom || role || "Agent"}</p>
+                <p className="text-xs text-slate-500">{user?.email || "-"}</p>
               </div>
               <button
                 type="button"
