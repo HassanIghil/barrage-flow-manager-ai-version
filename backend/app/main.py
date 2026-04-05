@@ -1,19 +1,12 @@
-# backend/app/main.py
-from app.routes import auth, users, dashboard, alerts, lacher_eau
-from app.routes import repartition
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes import auth, users, dashboard, alerts, repartition, releases
 
-app = FastAPI(
-    title="Barrage Flow Manager API",
-    description="API REST pour la gestion et la supervision du barrage.",
-    version="1.0.0",
-)
+app = FastAPI(title="Barrage Flow Manager API")
 
 origins = [
-    "http://localhost:5173",  # frontend (Vite)
-    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
@@ -29,8 +22,9 @@ app.include_router(users.router)
 app.include_router(dashboard.router)
 app.include_router(alerts.router)
 app.include_router(repartition.router)
-app.include_router(lacher_eau.router)
+app.include_router(releases.router)
+
 
 @app.get("/")
 def root():
-    return {"message": "API is running"}
+    return {"message": "Barrage Flow Manager API is running"}

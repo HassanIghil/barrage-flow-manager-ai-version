@@ -10,13 +10,12 @@ export default function ReleasesPage() {
   const fetchHistory = async () => {
     setLoading(true);
     try {
-      // Try the new enriched endpoint first, fall back to dashboard/history
       const response = await api.get("/releases/").catch(() =>
         api.get("/dashboard/history")
       );
       setHistory(response.data);
     } catch (err) {
-      console.error("Erreur lors de la récupération de l'historique:", err);
+      console.error("Erreur lors de la recuperation de l'historique:", err);
       setHistory([]);
     } finally {
       setLoading(false);
@@ -29,19 +28,17 @@ export default function ReleasesPage() {
 
   return (
     <section className="grid gap-8 lg:grid-cols-[1fr_2fr]">
-      {/* Colonne Formulaire */}
       <div className="space-y-6">
         <ReleaseForm onSuccess={fetchHistory} />
       </div>
 
-      {/* Colonne Historique */}
       <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h3 className="font-display text-2xl text-ink">
-              Historique des lâchers
+              Historique des lachers
             </h3>
-            <p className="mt-2 text-slate-500">Suivi des opérations récentes</p>
+            <p className="mt-2 text-slate-500">Suivi des operations recentes</p>
           </div>
           <button
             onClick={fetchHistory}
@@ -51,11 +48,7 @@ export default function ReleasesPage() {
           </button>
         </div>
 
-        <ReleaseTable
-          data={history}
-          loading={loading}
-          onRefresh={fetchHistory}
-        />
+        <ReleaseTable data={history} loading={loading} onRefresh={fetchHistory} />
       </div>
     </section>
   );

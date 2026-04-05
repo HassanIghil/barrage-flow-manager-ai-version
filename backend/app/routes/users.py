@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -14,13 +14,9 @@ router = APIRouter(prefix="/api/users", tags=["Users"])
 @router.post(
     "/register",
     response_model=UserResponse,
-    dependencies=[Depends(RoleChecker(["Admin", "Directeur", "directeur"]))],
+    dependencies=[Depends(RoleChecker(["Admin", "admin", "Directeur", "directeur"]))],
 )
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
-    """
-    Crée un nouveau compte agent.
-    Réservé aux rôles Admin et Directeur.
-    """
     existing = db.query(User).filter(User.email == user_data.email).first()
 
     if existing:
@@ -42,7 +38,6 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserResponse)
 def me(payload: dict = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Retourne le profil de l'utilisateur connecté."""
     email = payload.get("sub")
 
     user = db.query(User).filter(User.email == email).first()
@@ -56,12 +51,8 @@ def me(payload: dict = Depends(get_current_user), db: Session = Depends(get_db))
 @router.get(
     "/",
     response_model=List[UserResponse],
-    dependencies=[Depends(RoleChecker(["Admin", "Directeur", "directeur"]))],
+    dependencies=[Depends(RoleChecker(["Admin", "admin", "Directeur", "directeur"]))],
 )
 def list_users(db: Session = Depends(get_db)):
-    """
-    Liste tous les utilisateurs.
-    Réservé aux rôles Admin et Directeur.
-    """
     users = db.query(User).order_by(User.nom).all()
     return users

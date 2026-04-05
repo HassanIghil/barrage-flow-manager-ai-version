@@ -65,7 +65,6 @@ const EMPTY_FORM = { nom: "", email: "", password: "", role: "Gestionnaire" };
 export default function UsersPage() {
     const { role } = useAuth();
 
-    // Redirect non-directors/admins immediately
     const isAllowed = role?.toLowerCase() === "directeur" || role?.toLowerCase() === "admin";
     if (!isAllowed) {
         return <Navigate to="/unauthorized" replace />;
@@ -81,10 +80,10 @@ export default function UsersPage() {
     const fetchUsers = async () => {
         try {
             setLoadingUsers(true);
-            const res = await api.get("/users/");
+            const res = await api.get("/users");
             setUsers(res.data);
-        } catch {
-            // endpoint may not exist yet; fail silently
+        } catch (err) {
+            console.error("Erreur lors du chargement des agents:", err);
             setUsers([]);
         } finally {
             setLoadingUsers(false);
@@ -103,7 +102,7 @@ export default function UsersPage() {
             e.email = "Format d'email invalide.";
         if (!form.password) e.password = "Le mot de passe est requis.";
         else if (form.password.length < 6)
-            e.password = "Minimum 6 caractères.";
+            e.password = "Minimum 6 caracteres.";
         return e;
     };
 
@@ -125,12 +124,12 @@ export default function UsersPage() {
             await api.post("/users/register", form);
             setFeedback({
                 type: "success",
-                message: `Agent "${form.nom}" créé avec le rôle ${form.role}.`,
+                message: `Agent "${form.nom}" cree avec le role ${form.role}.`,
             });
             setForm(EMPTY_FORM);
-            fetchUsers();
+            await fetchUsers();
         } catch (err) {
-            const detail = err.response?.data?.detail ?? "Erreur lors de la création.";
+            const detail = err.response?.data?.detail ?? "Erreur lors de la creation.";
             setFeedback({ type: "error", message: detail });
         } finally {
             setSubmitting(false);
@@ -140,9 +139,7 @@ export default function UsersPage() {
 
     return (
         <section className="grid gap-8 lg:grid-cols-[420px_1fr]">
-            {/* ── FORM COLUMN ── */}
             <div className="space-y-4">
-                {/* Header card */}
                 <div className="rounded-[28px] bg-gradient-to-br from-lagoon to-cyan-700 p-6 text-white">
                     <div className="flex items-center gap-3">
                         <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15">
@@ -150,18 +147,17 @@ export default function UsersPage() {
                         </span>
                         <div>
                             <p className="text-xs uppercase tracking-[0.25em] text-white/70">
-                                Accès {role?.toLowerCase() === "admin" ? "Admin" : "Directeur"}
+                                Acces {role?.toLowerCase() === "admin" ? "Admin" : "Directeur"}
                             </p>
                             <h2 className="font-display text-xl">Gestion des agents</h2>
                         </div>
                     </div>
                     <p className="mt-3 text-sm text-white/80">
-                        Créez des comptes opérateurs, ingénieurs ou techniciens.
-                        Seul le Directeur ou l'Admin peut accéder à cette section.
+                        Creez des comptes operateurs, ingenieurs ou techniciens.
+                        Seul le Directeur ou l'Admin peut acceder a cette section.
                     </p>
                 </div>
 
-                {/* Feedback */}
                 {feedback && (
                     <div
                         className={`flex items-start gap-3 rounded-2xl px-4 py-3 text-sm font-medium ${feedback.type === "success"
@@ -178,7 +174,6 @@ export default function UsersPage() {
                     </div>
                 )}
 
-                {/* Create form */}
                 <div className="rounded-[28px] border border-slate-200 bg-white p-7 shadow-sm">
                     <div className="mb-6 flex items-center gap-2">
                         <UserPlus size={18} className="text-lagoon" />
@@ -220,7 +215,7 @@ export default function UsersPage() {
                                 type="password"
                                 value={form.password}
                                 onChange={handleChange}
-                                placeholder="Minimum 6 caractères"
+                                placeholder="Minimum 6 caracteres"
                                 className={`block w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-ink transition focus:bg-white focus:outline-none focus:ring-1 ${errors.password
                                         ? "border-red-400 focus:border-red-400 focus:ring-red-400"
                                         : "border-slate-200 focus:border-lagoon focus:ring-lagoon"
@@ -228,7 +223,7 @@ export default function UsersPage() {
                             />
                         </FieldWrapper>
 
-                        <FieldWrapper label="Rôle" icon={Briefcase}>
+                        <FieldWrapper label="Role" icon={Briefcase}>
                             <select
                                 name="role"
                                 value={form.role}
@@ -253,20 +248,19 @@ export default function UsersPage() {
                             ) : (
                                 <UserPlus size={16} />
                             )}
-                            {submitting ? "Création en cours…" : "Créer le compte"}
+                            {submitting ? "Creation en cours..." : "Creer le compte"}
                         </button>
                     </form>
                 </div>
             </div>
 
-            {/* ── USERS LIST COLUMN ── */}
             <div className="rounded-[28px] border border-slate-200 bg-white p-7 shadow-sm">
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h3 className="font-display text-2xl text-ink">Agents enregistrés</h3>
+                        <h3 className="font-display text-2xl text-ink">Agents enregistres</h3>
                         <p className="mt-1 text-sm text-slate-500">
                             {loadingUsers
-                                ? "Chargement…"
+                                ? "Chargement..."
                                 : `${users.length} compte${users.length !== 1 ? "s" : ""} actif${users.length !== 1 ? "s" : ""}`}
                         </p>
                     </div>
@@ -287,9 +281,9 @@ export default function UsersPage() {
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50">
                             <User size={24} className="text-slate-300" />
                         </div>
-                        <p className="mt-4 text-slate-400">Aucun agent enregistré</p>
+                        <p className="mt-4 text-slate-400">Aucun agent enregistre</p>
                         <p className="mt-1 text-xs text-slate-300">
-                            Utilisez le formulaire pour créer un premier compte.
+                            Utilisez le formulaire pour creer un premier compte.
                         </p>
                     </div>
                 ) : (
@@ -299,7 +293,7 @@ export default function UsersPage() {
                                 <tr className="border-b border-slate-100 text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     <th className="pb-4 pr-4">Nom</th>
                                     <th className="pb-4 pr-4">Email</th>
-                                    <th className="pb-4">Rôle</th>
+                                    <th className="pb-4">Role</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
