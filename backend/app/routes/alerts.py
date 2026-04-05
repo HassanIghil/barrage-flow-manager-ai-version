@@ -22,9 +22,9 @@ def get_recent_alerts(
         result = db.execute(
             text(
                 """
-                SELECT id_alerte, type, message, date_
+                SELECT id_alerte, type_alerte, message, date_alerte
                 FROM Alerte
-                ORDER BY date_ DESC
+                ORDER BY date_alerte DESC
                 LIMIT 10
                 """
             )
@@ -47,10 +47,10 @@ def get_critical_alerts(
         result = db.execute(
             text(
                 """
-                SELECT id_alerte, type, message, date_, id_barrage
+                SELECT id_alerte, type_alerte, message, date_alerte, id_barrage
                 FROM Alerte
-                WHERE type = 'niveau_critique'
-                ORDER BY date_ DESC
+                WHERE type_alerte = 'niveau_critique'
+                ORDER BY date_alerte DESC
                 LIMIT 10
                 """
             )

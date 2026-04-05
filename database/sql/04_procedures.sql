@@ -67,7 +67,7 @@ BEGIN
         -- nombre alertes critiques
         (SELECT COUNT(*) 
          FROM Alerte 
-         WHERE type = 'niveau_critique') AS nb_alertes_critiques,
+         WHERE type_alerte = 'niveau_critique') AS nb_alertes_critiques,
 
         -- demandes en attente
         (SELECT COUNT(*) 

@@ -109,14 +109,14 @@ export default function ReleasesPage() {
                     </td>
                     <td className="py-4 pr-4 text-right">
                       <span className="font-display text-sm text-ink">
-                        {Number(row.volume).toLocaleString()}
+                        {Number(row.volume_m3).toLocaleString()}
                       </span>
                     </td>
                     <td className="py-4 pr-4 text-sm text-slate-600">
-                      {row.nom_responsable || "N/A"}
+                      {row.nom_utilisateur || "N/A"}
                     </td>
                     <td className="py-4">
-                      {getStatusBadge(row.statut)}
+                      {getStatusBadge(row.status)}
                     </td>
                   </tr>
                 ))

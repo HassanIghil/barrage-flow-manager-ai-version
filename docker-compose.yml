@@ -1,0 +1,45 @@
+services:
+  database:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: barrage_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: barrage_flow_db_AI_Version
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  api:
+    build: 
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: barrage_api
+    restart: always
+    environment:
+      DATABASE_URL: mysql+pymysql://root:root_password@database:3306/barrage_flow_db_AI_Version
+      SECRET_KEY: supersecretkey
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: barrage_pma
+    restart: always
+    environment:
+      PMA_HOST: database
+      PMA_USER: root
+      PMA_PASSWORD: root_password
+      PMA_DB: barrage_flow_db_AI_Version
+    ports:
+      - "8080:80"
+    depends_on:
+      - database
+
+volumes:
+  mysql_data:

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
@@ -7,47 +7,102 @@ const AuthContext = createContext(null);
 function getStoredAuth() {
   return {
     token: localStorage.getItem("token"),
-    role: localStorage.getItem("role"),
-    userEmail: localStorage.getItem("userEmail"),
+    user: null,
   };
 }
 
 export function AuthProvider({ children }) {
   const navigate = useNavigate();
   const [authState, setAuthState] = useState(getStoredAuth);
+  const [isLoading, setIsLoading] = useState(Boolean(getStoredAuth().token));
+
+  async function loadCurrentUser() {
+    const response = await api.get("/users/me");
+
+    setAuthState((current) => ({
+      ...current,
+      user: response.data,
+    }));
+
+    return response.data;
+  }
+
+  useEffect(() => {
+    if (!authState.token) {
+      setIsLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    async function restoreSession() {
+      try {
+        const user = await api.get("/users/me");
+
+        if (!isMounted) {
+          return;
+        }
+
+        setAuthState((current) => ({
+          ...current,
+          user: user.data,
+        }));
+      } catch (error) {
+        if (isMounted) {
+          localStorage.removeItem("token");
+          setAuthState({
+            token: null,
+            user: null,
+          });
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    restoreSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authState.token]);
 
   async function login(credentials) {
     const response = await api.post("/auth/login", credentials);
     const nextAuth = {
       token: response.data.access_token,
-      role: response.data.role,
-      userEmail: credentials.email,
+      user: null,
     };
 
     localStorage.setItem("token", nextAuth.token);
-    localStorage.setItem("role", nextAuth.role);
-    localStorage.setItem("userEmail", nextAuth.userEmail);
     setAuthState(nextAuth);
+    setIsLoading(true);
+
+    const currentUser = await loadCurrentUser();
+
     navigate("/dashboard", { replace: true });
 
-    return response.data;
+    return currentUser;
   }
 
   function logout() {
     localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("userEmail");
     setAuthState({
       token: null,
-      role: null,
-      userEmail: null,
+      user: null,
     });
+    setIsLoading(false);
     navigate("/login", { replace: true });
   }
 
   const value = {
-    ...authState,
+    token: authState.token,
+    user: authState.user,
+    role: authState.user?.role ?? null,
     isAuthenticated: Boolean(authState.token),
+    isLoading,
     login,
     logout,
   };

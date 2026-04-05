@@ -1,19 +1,21 @@
 import {
+  BarChart3,
   Bell,
   Droplets,
-  LayoutDashboard,
   LogOut,
   Menu,
+  UserCircle2,
   Waves,
 } from "lucide-react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const links = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
   { to: "/releases", label: "Releases", icon: Waves },
   { to: "/alerts", label: "Alerts", icon: Bell },
+  { to: "/profile", label: "Profil", icon: UserCircle2 },
 ];
 
 function NavItem({ to, label, icon: Icon, onClick }) {
@@ -38,7 +40,36 @@ function NavItem({ to, label, icon: Icon, onClick }) {
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
-  const { role, logout, userEmail } = useAuth();
+  const { logout, user, role } = useAuth();
+  const location = useLocation();
+
+  const pageMeta = {
+    "/dashboard": {
+      eyebrow: "Tableau de bord",
+      title: "Vue d'ensemble du barrage",
+    },
+    "/releases": {
+      eyebrow: "Operations",
+      title: "Gestion des lachers",
+    },
+    "/alerts": {
+      eyebrow: "Surveillance",
+      title: "Alertes critiques",
+    },
+    "/profile": {
+      eyebrow: "Profil",
+      title: "Profil utilisateur",
+    },
+    "/unauthorized": {
+      eyebrow: "Securite",
+      title: "Acces refuse",
+    },
+  };
+
+  const currentPage = pageMeta[location.pathname] ?? {
+    eyebrow: "Espace securise",
+    title: "Barrage Flow Manager",
+  };
 
   return (
     <div className="min-h-screen text-ink">
@@ -55,7 +86,7 @@ export default function Layout() {
             </div>
             <div>
               <p className="font-display text-xl">Barrage</p>
-              <p className="text-sm text-slate-500">Operations center</p>
+              <p className="text-sm text-slate-500">Espace securise</p>
             </div>
           </div>
 
@@ -64,16 +95,6 @@ export default function Layout() {
               <NavItem key={link.to} {...link} onClick={() => setOpen(false)} />
             ))}
           </nav>
-
-          <div className="mt-8 rounded-3xl bg-lagoon p-5 text-white">
-            <p className="text-sm uppercase tracking-[0.2em] text-white/70">
-              Tailwind test
-            </p>
-            <p className="mt-2 text-lg font-semibold">Design system is active.</p>
-            <p className="mt-2 text-sm text-white/80">
-              This card is styled entirely with Tailwind utility classes.
-            </p>
-          </div>
         </aside>
 
         {open ? (
@@ -81,7 +102,7 @@ export default function Layout() {
             type="button"
             className="fixed inset-0 z-10 bg-slate-950/30 md:hidden"
             onClick={() => setOpen(false)}
-            aria-label="Close navigation"
+            aria-label="Fermer la navigation"
           />
         ) : null}
 
@@ -89,9 +110,9 @@ export default function Layout() {
           <header className="flex items-center justify-between border-b border-slate-200/70 px-5 py-4 md:px-8">
             <div>
               <p className="text-sm uppercase tracking-[0.3em] text-slate-400">
-                Water control
+                {currentPage.eyebrow}
               </p>
-              <h1 className="font-display text-2xl">Youssef Ibn Tachfine</h1>
+              <h1 className="font-display text-2xl">{currentPage.title}</h1>
             </div>
 
             <div className="flex items-center gap-3">
@@ -99,16 +120,16 @@ export default function Layout() {
                 type="button"
                 className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-700 md:hidden"
                 onClick={() => setOpen(true)}
-                aria-label="Open navigation"
+                aria-label="Ouvrir la navigation"
               >
                 <Menu size={18} />
               </button>
               <div className="rounded-2xl bg-spray px-4 py-3 text-right">
                 <p className="text-xs uppercase tracking-[0.25em] text-lagoon">
-                  Session
+                  Connecte
                 </p>
-                <p className="text-sm font-semibold">{role || "Connected"}</p>
-                <p className="text-xs text-slate-500">{userEmail}</p>
+                <p className="text-sm font-semibold">{user?.nom || role || "Agent"}</p>
+                <p className="text-xs text-slate-500">{user?.email || "-"}</p>
               </div>
               <button
                 type="button"
@@ -116,7 +137,7 @@ export default function Layout() {
                 onClick={logout}
               >
                 <LogOut size={16} />
-                <span>Logout</span>
+                <span>Deconnexion</span>
               </button>
             </div>
           </header>
