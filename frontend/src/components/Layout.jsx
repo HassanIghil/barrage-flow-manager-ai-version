@@ -4,19 +4,28 @@ import {
   Droplets,
   LogOut,
   Menu,
-  UserCircle2,
+  Users,
   Waves,
 } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
-const links = [
-  { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
-  { to: "/releases", label: "Releases", icon: Waves },
-  { to: "/alerts", label: "Alerts", icon: Bell },
-  { to: "/profile", label: "Profil", icon: UserCircle2 },
-];
+function buildLinks(role) {
+  const normalizedRole = role?.toLowerCase();
+  const isDirecteur = normalizedRole === "directeur" || normalizedRole === "admin";
+  const links = [
+    { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
+    { to: "/releases", label: "Releases", icon: Waves },
+    { to: "/alerts", label: "Alerts", icon: Bell },
+  ];
+
+  if (isDirecteur) {
+    links.push({ to: "/users", label: "Agents", icon: Users });
+  }
+
+  return links;
+}
 
 function NavItem({ to, label, icon: Icon, onClick }) {
   return (
@@ -60,6 +69,10 @@ export default function Layout() {
       eyebrow: "Profil",
       title: "Profil utilisateur",
     },
+    "/users": {
+      eyebrow: "Administration",
+      title: "Gestion des agents",
+    },
     "/unauthorized": {
       eyebrow: "Securite",
       title: "Acces refuse",
@@ -70,6 +83,8 @@ export default function Layout() {
     eyebrow: "Espace securise",
     title: "Barrage Flow Manager",
   };
+
+  const links = buildLinks(role);
 
   return (
     <div className="min-h-screen text-ink">

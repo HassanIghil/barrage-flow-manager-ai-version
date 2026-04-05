@@ -6,6 +6,7 @@ import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import ReleasesPage from "./pages/ReleasesPage";
 import AlertsPage from "./pages/AlertsPage";
+import UsersPage from "./pages/Users";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 
 export default function App() {
@@ -27,7 +28,7 @@ export default function App() {
           path="/releases"
           element={
             <ProtectedRoute
-              allowedRoles={["Directeur", "Gestionnaire", "Technicien", "admin", "Admin", "gestionnaire", "technicien"]}
+              allowedRoles={["Admin", "admin", "Directeur", "directeur", "Gestionnaire", "gestionnaire", "Technicien", "technicien"]}
             >
               <ReleasesPage />
             </ProtectedRoute>
@@ -37,9 +38,17 @@ export default function App() {
           path="/alerts"
           element={
             <ProtectedRoute
-              allowedRoles={["Directeur", "Technicien", "admin", "Admin", "technicien"]}
+              allowedRoles={["Admin", "admin", "Directeur", "directeur", "Technicien", "technicien"]}
             >
               <AlertsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "admin", "Directeur", "directeur"]}>
+              <UsersPage />
             </ProtectedRoute>
           }
         />

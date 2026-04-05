@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import List
+
 from app.core.database import get_db
 from app.schemas.user import UserCreate, UserResponse
 from app.models.user import User
@@ -12,7 +14,7 @@ router = APIRouter(prefix="/api/users", tags=["Users"])
 @router.post(
     "/register",
     response_model=UserResponse,
-    dependencies=[Depends(RoleChecker(["Directeur", "admin", "Admin"]))],
+    dependencies=[Depends(RoleChecker(["Admin", "admin", "Directeur", "directeur"]))],
 )
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == user_data.email).first()
@@ -44,3 +46,13 @@ def me(payload: dict = Depends(get_current_user), db: Session = Depends(get_db))
         raise HTTPException(status_code=404, detail="User not found")
 
     return user
+
+
+@router.get(
+    "/",
+    response_model=List[UserResponse],
+    dependencies=[Depends(RoleChecker(["Admin", "admin", "Directeur", "directeur"]))],
+)
+def list_users(db: Session = Depends(get_db)):
+    users = db.query(User).order_by(User.nom).all()
+    return users
