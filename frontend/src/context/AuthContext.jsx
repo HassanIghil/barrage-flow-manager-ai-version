@@ -82,7 +82,7 @@ export function AuthProvider({ children }) {
 
     const currentUser = await loadCurrentUser();
 
-    navigate("/profile", { replace: true });
+    navigate("/dashboard", { replace: true });
 
     return currentUser;
   }

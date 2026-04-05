@@ -6,14 +6,14 @@ import { useAuth } from "../context/AuthContext";
 export default function Login() {
   const { isAuthenticated, isLoading, login } = useAuth();
   const [formData, setFormData] = useState({
-    email: "directeur@barrage-yt.ma",
-    password: "",
+    email: "directeur@barrage.ma",
+    password: "password",
   });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isLoading && isAuthenticated) {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   async function handleSubmit(event) {

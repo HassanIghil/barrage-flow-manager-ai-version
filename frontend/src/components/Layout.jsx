@@ -1,5 +1,5 @@
-import { Droplets, LogOut, Menu, UserCircle2 } from "lucide-react";
-import { NavLink, Outlet } from "react-router-dom";
+import { BarChart3, Droplets, LogOut, Menu, UserCircle2 } from "lucide-react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
@@ -26,6 +26,23 @@ function NavItem({ to, label, icon: Icon, onClick }) {
 export default function Layout() {
   const [open, setOpen] = useState(false);
   const { logout, user } = useAuth();
+  const location = useLocation();
+
+  const pageMeta = {
+    "/dashboard": {
+      eyebrow: "Tableau de bord",
+      title: "Vue d'ensemble du barrage",
+    },
+    "/profile": {
+      eyebrow: "Profil",
+      title: "Profil utilisateur",
+    },
+  };
+
+  const currentPage = pageMeta[location.pathname] ?? {
+    eyebrow: "Espace securise",
+    title: "Barrage Flow Manager",
+  };
 
   return (
     <div className="min-h-screen text-ink">
@@ -48,6 +65,12 @@ export default function Layout() {
 
           <nav className="space-y-2">
             <NavItem
+              to="/dashboard"
+              label="Dashboard"
+              icon={BarChart3}
+              onClick={() => setOpen(false)}
+            />
+            <NavItem
               to="/profile"
               label="Profil"
               icon={UserCircle2}
@@ -69,9 +92,9 @@ export default function Layout() {
           <header className="flex items-center justify-between border-b border-slate-200/70 px-5 py-4 md:px-8">
             <div>
               <p className="text-sm uppercase tracking-[0.3em] text-slate-400">
-                Tableau de bord
+                {currentPage.eyebrow}
               </p>
-              <h1 className="font-display text-2xl">Profil utilisateur</h1>
+              <h1 className="font-display text-2xl">{currentPage.title}</h1>
             </div>
 
             <div className="flex items-center gap-3">
