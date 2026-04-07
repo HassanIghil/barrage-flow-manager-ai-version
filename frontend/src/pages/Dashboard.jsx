@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AlertCircle, Calendar, Droplets } from "lucide-react";
 import api from "../api/axios";
+import AlertBanner from "../components/AlertBanner";
 import Gauges from "../components/Gauges";
 
 export default function Dashboard() {
@@ -35,6 +36,8 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
+      <AlertBanner />
+
       <header className="mb-8">
         <h1 className="text-2xl font-bold text-slate-800">
           Tableau de Bord - Barrage Flow Manager
