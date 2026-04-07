@@ -5,7 +5,9 @@ import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import ReleasesPage from "./pages/ReleasesPage";
 import AlertsPage from "./pages/AlertsPage";
+import DemandesPage from "./pages/DemandesPage";
 import UsersPage from "./pages/Users";
+import ProfilePage from "./pages/ProfilePage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 
 export default function App() {
@@ -19,10 +21,10 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
 
-        {/* Releases : Directeur, Gestionnaire, Technicien */}
+        {/* Releases : Directeur, Admin, Gestionnaire, Technicien */}
         <Route
           path="/releases"
           element={
@@ -34,7 +36,7 @@ export default function App() {
           }
         />
 
-        {/* Alerts : Directeur, Technicien */}
+        {/* Alerts : Directeur, Admin, Technicien */}
         <Route
           path="/alerts"
           element={
@@ -44,11 +46,17 @@ export default function App() {
           }
         />
 
+        {/* Demandes : tous les rôles authentifiés */}
+        <Route path="/demandes" element={<DemandesPage />} />
+
+        {/* Profile : tous les rôles authentifiés */}
+        <Route path="/profile" element={<ProfilePage />} />
+
         {/* Users : Directeur uniquement */}
         <Route
           path="/users"
           element={
-            <ProtectedRoute allowedRoles={["Directeur"]}>
+            <ProtectedRoute allowedRoles={["Directeur", "Admin"]}>
               <UsersPage />
             </ProtectedRoute>
           }

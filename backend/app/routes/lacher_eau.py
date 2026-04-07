@@ -192,3 +192,51 @@ def list_releases(
         raise HTTPException(
             status_code=500, detail=f"Erreur base de données : {str(e)}"
         )
+
+
+@router.put("/{id_lacher}/cancel", response_model=dict)
+def cancel_release(
+    id_lacher: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(
+        RoleChecker(["Directeur", "directeur", "Admin", "admin"])
+    ),
+):
+    """
+    Annule un lâcher d'eau planifié ou en cours.
+    ─ Réservé au Directeur/Admin uniquement.
+    ─ Met le statut à 'annule'.
+    ─ Bloque si le lâcher est déjà terminé ou annulé.
+    """
+    try:
+        lacher = db.query(LacherEau).filter(LacherEau.id_lacher == id_lacher).first()
+        if not lacher:
+            raise HTTPException(
+                status_code=404, detail=f"Lâcher #{id_lacher} introuvable"
+            )
+
+        if lacher.statut not in (LacherStatus.planifie, LacherStatus.en_cours):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Ce lâcher est déjà '{lacher.statut.value}' — "
+                    "seuls les lâchers planifiés ou en cours peuvent être annulés."
+                ),
+            )
+
+        lacher.statut = LacherStatus.annule
+        db.commit()
+
+        return {
+            "message": f"Lâcher #{id_lacher} annulé avec succès.",
+            "id_lacher": id_lacher,
+            "statut": "annule",
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500, detail=f"Erreur lors de l'annulation : {str(e)}"
+        )

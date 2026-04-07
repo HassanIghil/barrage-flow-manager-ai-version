@@ -28,35 +28,55 @@ export default function ReleasesPage() {
   }, []);
 
   return (
-    <section className="grid gap-8 lg:grid-cols-[1fr_2fr]">
-      {/* Colonne Formulaire */}
-      <div className="space-y-6">
-        <ReleaseForm onSuccess={fetchHistory} />
+    <div className="space-y-8 animate-fadeIn pb-12">
+      {/* Header Detail */}
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="h-2 w-2 rounded-full bg-accent animate-pulse shadow-glow" />
+          <span className="text-[10px] uppercase font-black tracking-[0.3em] text-accent">Contrôle des Lâchers</span>
+        </div>
+        <h2 className="font-display text-4xl font-extrabold text-text-primary tracking-tight">Gestion des Débits</h2>
+        <p className="text-text-muted">Planification et suivi des opérations hydrauliques en temps réel.</p>
       </div>
 
-      {/* Colonne Historique */}
-      <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h3 className="font-display text-2xl text-ink">
-              Historique des lâchers
-            </h3>
-            <p className="mt-2 text-slate-500">Suivi des opérations récentes</p>
-          </div>
-          <button
-            onClick={fetchHistory}
-            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
-          >
-            Actualiser
-          </button>
+      <section className="grid gap-8 lg:grid-cols-[1.2fr_2.8fr]">
+        {/* Colonne Formulaire */}
+        <div className="space-y-6">
+          <ReleaseForm onSuccess={fetchHistory} />
         </div>
 
-        <ReleaseTable
-          data={history}
-          loading={loading}
-          onRefresh={fetchHistory}
-        />
-      </div>
-    </section>
+        {/* Colonne Historique */}
+        <div className="glass p-8 rounded-[40px] flex flex-col relative overflow-hidden group">
+          <div className="absolute -right-24 -top-24 h-48 w-48 bg-accent/5 blur-[100px] rounded-full group-hover:bg-accent/10 transition-all duration-700" />
+          
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 relative z-10">
+            <div>
+              <h3 className="font-display text-2xl font-bold text-text-primary tracking-tight">
+                Historique des Lâchers
+              </h3>
+              <p className="mt-1 text-sm text-text-muted font-medium">Suivi exhaustif des opérations récentes</p>
+            </div>
+            <button
+              onClick={fetchHistory}
+              disabled={loading}
+              className="glass glass-hover px-5 py-2.5 rounded-2xl flex items-center gap-3 text-sm font-bold text-text-dim hover:text-accent transition-all group/btn"
+            >
+              <div className={loading ? "animate-spin" : "group-hover/btn:rotate-180 transition-transform duration-500"}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+              </div>
+              <span>Actualiser</span>
+            </button>
+          </div>
+
+          <div className="relative z-10 flex-1">
+            <ReleaseTable
+              data={history}
+              loading={loading}
+              onRefresh={fetchHistory}
+            />
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

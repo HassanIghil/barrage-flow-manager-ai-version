@@ -1,6 +1,6 @@
 # backend/app/main.py
 from app.routes import auth, users, dashboard, alerts, lacher_eau
-from app.routes import repartition
+from app.routes import repartition, demandes, cooperatives
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,6 +30,8 @@ app.include_router(dashboard.router)
 app.include_router(alerts.router)
 app.include_router(repartition.router)
 app.include_router(lacher_eau.router)
+app.include_router(demandes.router)
+app.include_router(cooperatives.router)
 
 @app.get("/")
 def root():
