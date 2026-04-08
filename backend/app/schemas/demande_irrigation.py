@@ -7,7 +7,7 @@ from app.models.demande_irrigation import DemandeStatus
 
 class DemandeIrrigationCreate(BaseModel):
     volume_demande: Decimal = Field(..., gt=0)
-    id_coop: int
+    id_coop: int = Field(..., gt=0)  #accepte les valeurs > 0 uniquement
 
 class DemandeIrrigationResponse(BaseModel):
     id_demande: int
