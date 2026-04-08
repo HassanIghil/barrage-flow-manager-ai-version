@@ -8,9 +8,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: barrage_flow_db_AI_Version
-    ports:
-      - "3306:3306"
-    volumes:
+    #  ports supprimés
+     volumes:
       - mysql_data:/var/lib/mysql
 
   api:
