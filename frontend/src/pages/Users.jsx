@@ -12,34 +12,28 @@ import {
     Mail,
     Lock,
     Briefcase,
+    RefreshCw,
+    Search
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 const ROLES = [
     { value: "Gestionnaire", label: "Gestionnaire" },
     { value: "Technicien", label: "Technicien" },
-    { value: "Agriculteur", label: "Agriculteur" },
     { value: "Directeur", label: "Directeur" },
 ];
 
 const ROLE_COLORS = {
-    Directeur:
-        "bg-lagoon/10 text-lagoon ring-1 ring-inset ring-lagoon/20",
-    Gestionnaire:
-        "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20",
-    Technicien:
-        "bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-600/20",
-    Agriculteur:
-        "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20",
-    Admin:
-        "bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20",
+    Directeur: "bg-accent/10 text-accent-light border-accent/20",
+    Gestionnaire: "bg-warning/10 text-orange-400 border-warning/20",
+    Technicien: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    Admin: "bg-danger/10 text-danger border-danger/20",
 };
 
 function RoleBadge({ role }) {
-    const cls =
-        ROLE_COLORS[role] ??
-        "bg-slate-50 text-slate-600 ring-1 ring-inset ring-slate-600/20";
+    const cls = ROLE_COLORS[role] ?? "bg-white/5 text-text-muted border-border-dark";
     return (
-        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}>
+        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${cls}`}>
             {role}
         </span>
     );
@@ -47,14 +41,17 @@ function RoleBadge({ role }) {
 
 function FieldWrapper({ label, icon: Icon, children, error }) {
     return (
-        <div>
-            <label className="mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-700">
-                <Icon size={14} className="text-slate-400" />
+        <div className="space-y-2">
+            <label className="flex items-center gap-2 text-xs font-semibold text-text-muted uppercase tracking-wider ml-1">
+                <Icon size={14} className="text-text-dim" />
                 {label}
             </label>
             {children}
             {error && (
-                <p className="mt-1.5 text-xs text-red-500">{error}</p>
+                <p className="mt-1 flex items-center gap-1.5 text-xs text-danger font-medium ml-1 animate-fadeIn">
+                    <AlertTriangle size={12} />
+                    {error}
+                </p>
             )}
         </div>
     );
@@ -63,10 +60,10 @@ function FieldWrapper({ label, icon: Icon, children, error }) {
 const EMPTY_FORM = { nom: "", email: "", password: "", role: "Gestionnaire" };
 
 export default function UsersPage() {
-    const { role } = useAuth();
+    const { role: currentUserRole } = useAuth();
 
     // Redirect non-directors/admins immediately
-    const isAllowed = role?.toLowerCase() === "directeur" || role?.toLowerCase() === "admin";
+    const isAllowed = currentUserRole?.toLowerCase() === "directeur" || currentUserRole?.toLowerCase() === "admin";
     if (!isAllowed) {
         return <Navigate to="/unauthorized" replace />;
     }
@@ -76,7 +73,7 @@ export default function UsersPage() {
     const [form, setForm] = useState(EMPTY_FORM);
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
-    const [feedback, setFeedback] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const fetchUsers = async () => {
         try {
@@ -84,8 +81,8 @@ export default function UsersPage() {
             const res = await api.get("/users/");
             setUsers(res.data);
         } catch {
-            // endpoint may not exist yet; fail silently
             setUsers([]);
+            toast.error("Impossible de charger les agents.");
         } finally {
             setLoadingUsers(false);
         }
@@ -123,214 +120,205 @@ export default function UsersPage() {
         setSubmitting(true);
         try {
             await api.post("/users/register", form);
-            setFeedback({
-                type: "success",
-                message: `Agent "${form.nom}" créé avec le rôle ${form.role}.`,
-            });
+            toast.success(`Agent "${form.nom}" créé avec succès.`);
             setForm(EMPTY_FORM);
             fetchUsers();
         } catch (err) {
             const detail = err.response?.data?.detail ?? "Erreur lors de la création.";
-            setFeedback({ type: "error", message: detail });
+            toast.error(detail);
         } finally {
             setSubmitting(false);
-            setTimeout(() => setFeedback(null), 5000);
         }
     };
 
+    const filteredUsers = users.filter((u) => 
+        u.nom?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <section className="grid gap-8 lg:grid-cols-[420px_1fr]">
-            {/* ── FORM COLUMN ── */}
-            <div className="space-y-4">
-                {/* Header card */}
-                <div className="rounded-[28px] bg-gradient-to-br from-lagoon to-cyan-700 p-6 text-white">
-                    <div className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15">
-                            <ShieldCheck size={20} />
-                        </span>
-                        <div>
-                            <p className="text-xs uppercase tracking-[0.25em] text-white/70">
-                                Accès {role?.toLowerCase() === "admin" ? "Admin" : "Directeur"}
-                            </p>
-                            <h2 className="font-display text-xl">Gestion des agents</h2>
-                        </div>
+        <div className="space-y-8 animate-fadeIn">
+            {/* ── HEADER ── */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-2xl bg-accent/10 flex items-center justify-center text-accent border border-accent/20">
+                        <ShieldCheck size={28} />
                     </div>
-                    <p className="mt-3 text-sm text-white/80">
-                        Créez des comptes opérateurs, ingénieurs ou techniciens.
-                        Seul le Directeur ou l'Admin peut accéder à cette section.
-                    </p>
-                </div>
-
-                {/* Feedback */}
-                {feedback && (
-                    <div
-                        className={`flex items-start gap-3 rounded-2xl px-4 py-3 text-sm font-medium ${feedback.type === "success"
-                                ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20"
-                                : "bg-red-50 text-red-700 ring-1 ring-red-600/20"
-                            }`}
-                    >
-                        {feedback.type === "success" ? (
-                            <CheckCircle2 size={16} className="mt-0.5 shrink-0" />
-                        ) : (
-                            <AlertTriangle size={16} className="mt-0.5 shrink-0" />
-                        )}
-                        {feedback.message}
-                    </div>
-                )}
-
-                {/* Create form */}
-                <div className="rounded-[28px] border border-slate-200 bg-white p-7 shadow-sm">
-                    <div className="mb-6 flex items-center gap-2">
-                        <UserPlus size={18} className="text-lagoon" />
-                        <h3 className="font-display text-xl text-ink">Nouvel agent</h3>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-                        <FieldWrapper label="Nom complet" icon={User} error={errors.nom}>
-                            <input
-                                name="nom"
-                                type="text"
-                                value={form.nom}
-                                onChange={handleChange}
-                                placeholder="Ex : Fatima El Amrani"
-                                className={`mt-0 block w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-ink transition focus:bg-white focus:outline-none focus:ring-1 ${errors.nom
-                                        ? "border-red-400 focus:border-red-400 focus:ring-red-400"
-                                        : "border-slate-200 focus:border-lagoon focus:ring-lagoon"
-                                    }`}
-                            />
-                        </FieldWrapper>
-
-                        <FieldWrapper label="Adresse email" icon={Mail} error={errors.email}>
-                            <input
-                                name="email"
-                                type="email"
-                                value={form.email}
-                                onChange={handleChange}
-                                placeholder="agent@barrage.ma"
-                                className={`block w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-ink transition focus:bg-white focus:outline-none focus:ring-1 ${errors.email
-                                        ? "border-red-400 focus:border-red-400 focus:ring-red-400"
-                                        : "border-slate-200 focus:border-lagoon focus:ring-lagoon"
-                                    }`}
-                            />
-                        </FieldWrapper>
-
-                        <FieldWrapper label="Mot de passe" icon={Lock} error={errors.password}>
-                            <input
-                                name="password"
-                                type="password"
-                                value={form.password}
-                                onChange={handleChange}
-                                placeholder="Minimum 6 caractères"
-                                className={`block w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-ink transition focus:bg-white focus:outline-none focus:ring-1 ${errors.password
-                                        ? "border-red-400 focus:border-red-400 focus:ring-red-400"
-                                        : "border-slate-200 focus:border-lagoon focus:ring-lagoon"
-                                    }`}
-                            />
-                        </FieldWrapper>
-
-                        <FieldWrapper label="Rôle" icon={Briefcase}>
-                            <select
-                                name="role"
-                                value={form.role}
-                                onChange={handleChange}
-                                className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-ink transition focus:border-lagoon focus:bg-white focus:outline-none focus:ring-1 focus:ring-lagoon"
-                            >
-                                {ROLES.map((r) => (
-                                    <option key={r.value} value={r.value}>
-                                        {r.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </FieldWrapper>
-
-                        <button
-                            type="submit"
-                            disabled={submitting}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-lagoon py-3.5 text-sm font-semibold text-white transition hover:bg-cyan-700 disabled:opacity-50"
-                        >
-                            {submitting ? (
-                                <Loader2 size={16} className="animate-spin" />
-                            ) : (
-                                <UserPlus size={16} />
-                            )}
-                            {submitting ? "Création en cours…" : "Créer le compte"}
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            {/* ── USERS LIST COLUMN ── */}
-            <div className="rounded-[28px] border border-slate-200 bg-white p-7 shadow-sm">
-                <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h3 className="font-display text-2xl text-ink">Agents enregistrés</h3>
-                        <p className="mt-1 text-sm text-slate-500">
-                            {loadingUsers
-                                ? "Chargement…"
-                                : `${users.length} compte${users.length !== 1 ? "s" : ""} actif${users.length !== 1 ? "s" : ""}`}
-                        </p>
+                        <h2 className="font-display text-2xl font-bold text-text-primary">Gestion des agents</h2>
+                        <p className="text-sm text-text-muted">Gérez les comptes des opérateurs et techniciens du barrage.</p>
+                    </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                    <div className="relative">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+                        <input
+                            type="text"
+                            placeholder="Rechercher un agent..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="bg-white/5 border border-border-dark rounded-xl pl-10 pr-4 py-2 text-sm text-text-primary focus:ring-1 focus:ring-accent outline-none w-64 transition-all"
+                        />
                     </div>
                     <button
                         onClick={fetchUsers}
-                        className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                        className="p-2 rounded-xl bg-white/5 border border-border-dark text-text-muted hover:text-accent hover:border-accent/50 transition-all"
+                        title="Actualiser la liste"
                     >
-                        Actualiser
+                        <RefreshCw size={18} className={loadingUsers ? "animate-spin" : ""} />
                     </button>
                 </div>
-
-                {loadingUsers ? (
-                    <div className="flex items-center justify-center py-16">
-                        <Loader2 size={24} className="animate-spin text-slate-300" />
-                    </div>
-                ) : users.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-center">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50">
-                            <User size={24} className="text-slate-300" />
-                        </div>
-                        <p className="mt-4 text-slate-400">Aucun agent enregistré</p>
-                        <p className="mt-1 text-xs text-slate-300">
-                            Utilisez le formulaire pour créer un premier compte.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="border-b border-slate-100 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                                    <th className="pb-4 pr-4">Nom</th>
-                                    <th className="pb-4 pr-4">Email</th>
-                                    <th className="pb-4">Rôle</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-50">
-                                {users.map((u) => (
-                                    <tr
-                                        key={u.id_user ?? u.email}
-                                        className="group transition-colors hover:bg-slate-50/60"
-                                    >
-                                        <td className="py-4 pr-4">
-                                            <div className="flex items-center gap-3">
-                                                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-spray text-xs font-semibold text-lagoon">
-                                                    {u.nom?.charAt(0).toUpperCase() ?? "?"}
-                                                </span>
-                                                <span className="text-sm font-medium text-ink">
-                                                    {u.nom}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="py-4 pr-4 text-sm text-slate-500">
-                                            {u.email}
-                                        </td>
-                                        <td className="py-4">
-                                            <RoleBadge role={u.role} />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
             </div>
-        </section>
+
+            <div className="grid gap-8 lg:grid-cols-[400px_1fr]">
+                {/* ── FORM COLUMN ── */}
+                <div className="space-y-6">
+                    <div className="glass p-8 rounded-[32px] border border-border-dark shadow-xl relative overflow-hidden">
+                        {/* Motif décoratif en arrière-plan */}
+                        <div className="absolute top-0 right-0 h-32 w-32 bg-accent/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+                        
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="h-10 w-10 rounded-xl bg-accent text-black flex items-center justify-center shadow-glow">
+                                    <UserPlus size={20} />
+                                </div>
+                                <h3 className="font-display text-xl font-bold text-text-primary">Nouvel agent</h3>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                                <FieldWrapper label="Nom complet" icon={User} error={errors.nom}>
+                                    <input
+                                        name="nom"
+                                        type="text"
+                                        value={form.nom}
+                                        onChange={handleChange}
+                                        placeholder="Ex : Fatima El Amrani"
+                                        className="w-full bg-white/5 border border-border-dark rounded-2xl p-4 text-sm text-text-primary focus:ring-2 focus:ring-accent outline-none transition-all placeholder:text-text-muted/50"
+                                    />
+                                </FieldWrapper>
+
+                                <FieldWrapper label="Adresse email" icon={Mail} error={errors.email}>
+                                    <input
+                                        name="email"
+                                        type="email"
+                                        value={form.email}
+                                        onChange={handleChange}
+                                        placeholder="agent@barrage.ma"
+                                        className="w-full bg-white/5 border border-border-dark rounded-2xl p-4 text-sm text-text-primary focus:ring-2 focus:ring-accent outline-none transition-all placeholder:text-text-muted/50"
+                                    />
+                                </FieldWrapper>
+
+                                <FieldWrapper label="Mot de passe" icon={Lock} error={errors.password}>
+                                    <input
+                                        name="password"
+                                        type="password"
+                                        value={form.password}
+                                        onChange={handleChange}
+                                        placeholder="Min. 6 caractères"
+                                        className="w-full bg-white/5 border border-border-dark rounded-2xl p-4 text-sm text-text-primary focus:ring-2 focus:ring-accent outline-none transition-all placeholder:text-text-muted/50"
+                                    />
+                                </FieldWrapper>
+
+                                <FieldWrapper label="Rôle" icon={Briefcase}>
+                                    <select
+                                        name="role"
+                                        value={form.role}
+                                        onChange={handleChange}
+                                        className="w-full bg-white/5 border border-border-dark rounded-2xl p-4 text-sm text-text-primary focus:ring-2 focus:ring-accent outline-none transition-all appearance-none cursor-pointer"
+                                    >
+                                        {ROLES.map((r) => (
+                                            <option key={r.value} value={r.value} className="bg-bg-sidebar">
+                                                {r.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </FieldWrapper>
+
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-accent py-4 text-sm font-bold text-black shadow-glow transition hover:shadow-glow-lg disabled:opacity-50 mt-4 group"
+                                >
+                                    {submitting ? (
+                                        <Loader2 size={18} className="animate-spin" />
+                                    ) : (
+                                        <UserPlus size={18} className="group-hover:scale-110 transition-transform" />
+                                    )}
+                                    {submitting ? "Création..." : "Créer le compte agent"}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── USERS LIST COLUMN ── */}
+                <div className="glass rounded-[32px] border border-border-dark overflow-hidden flex flex-col shadow-xl">
+                    <div className="p-8 border-b border-border-dark flex items-center justify-between">
+                        <h3 className="font-display text-xl font-bold text-text-primary">Agents enregistrés</h3>
+                        <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-medium text-text-muted border border-border-dark">
+                            {users.length} total
+                        </span>
+                    </div>
+
+                    <div className="flex-1 overflow-x-auto">
+                        {loadingUsers ? (
+                            <div className="flex flex-col items-center justify-center py-24 gap-4">
+                                <Loader2 size={32} className="animate-spin text-accent" />
+                                <p className="text-sm text-text-muted">Chargement des comptes...</p>
+                            </div>
+                        ) : filteredUsers.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-24 text-center px-6">
+                                <div className="h-16 w-16 rounded-3xl bg-white/5 flex items-center justify-center text-text-muted mb-4 border border-border-dark">
+                                    <User size={32} />
+                                </div>
+                                <p className="text-text-primary font-bold">Aucun agent trouvé</p>
+                                <p className="text-sm text-text-muted max-w-xs mt-1">
+                                    Aucun résultat ne correspond à votre recherche ou aucun compte n'a encore été créé.
+                                </p>
+                            </div>
+                        ) : (
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr className="bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest text-text-muted border-b border-border-dark">
+                                        <th className="py-4 px-8">Agent</th>
+                                        <th className="py-4 px-8">Coordonnées</th>
+                                        <th className="py-4 px-8">Rôle assigné</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-border-dark">
+                                    {filteredUsers.map((u) => (
+                                        <tr
+                                            key={u.id_user ?? u.email}
+                                            className="group hover:bg-white/[0.02] transition-colors"
+                                        >
+                                            <td className="py-5 px-8">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-accent/20 to-accent-light/10 flex items-center justify-center text-accent-light font-bold shadow-panel">
+                                                        {u.nom?.charAt(0).toUpperCase() ?? "?"}
+                                                    </div>
+                                                    <span className="text-sm font-bold text-text-primary group-hover:text-accent-light transition-colors">
+                                                        {u.nom}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="py-5 px-8">
+                                                <div className="flex items-center gap-2 text-sm text-text-muted">
+                                                    <Mail size={14} className="text-text-dim" />
+                                                    {u.email}
+                                                </div>
+                                            </td>
+                                            <td className="py-5 px-8 text-right">
+                                                <RoleBadge role={u.role} />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
