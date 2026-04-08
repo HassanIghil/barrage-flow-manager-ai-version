@@ -7,6 +7,6 @@ cryptography
 python-dotenv
 python-multipart
 python-jose[cryptography]
-passlib[bcrypt]
+passlib[bcrypt]==1.7.4
 bcrypt
 email-validator

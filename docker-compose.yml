@@ -11,6 +11,7 @@ services:
     #  ports supprimés
      volumes:
       - mysql_data:/var/lib/mysql
+      - ./database/sql/06_app_user.sql:/docker-entrypoint-initdb.d/06_app_user.sql
 
   api:
     build: 
@@ -19,8 +20,8 @@ services:
     container_name: barrage_api
     restart: always
     environment:
-      DATABASE_URL: mysql+pymysql://root:root_password@database:3306/barrage_flow_db_AI_Version
-      SECRET_KEY: supersecretkey
+       DATABASE_URL: mysql+pymysql://barrage_app:AppSecure2024!@database:3306/barrage_flow_db_AI_Version
+       SECRET_KEY: supersecretkey
     ports:
       - "8000:8000"
     depends_on:
