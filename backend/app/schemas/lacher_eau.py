@@ -30,8 +30,8 @@ class ReleaseRequest(BaseModel):
 class LacherEauCreate(BaseModel):
     volume: Decimal = Field(..., gt=0)
     id_demande: Optional[int] = None
-    id_user: int
-    id_barrage: int
+    id_user: int = Field(..., gt=0)    # valeurs > 0 uniquement
+    id_barrage: int = Field(..., gt=0)    # valeurs > 0 uniquement
 
 class LacherEauResponse(BaseModel):
     id_lacher: int
