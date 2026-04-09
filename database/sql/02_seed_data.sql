@@ -8,12 +8,10 @@ INSERT INTO Barrage (nom, capacite_max, niveau_actuel, seuil_critique)
 VALUES
 ('Youssef Ibn Tachfine', 300000000.00, 180000000.00, 50000000.00);
 
-INSERT INTO Utilisateur (nom, email, password, role)
-VALUES
-('Mohamed Benali', 'directeur@barrage.ma', 'password', 'admin'),
-('Fatima El Amrani', 'ingenieur1@barrage.ma', 'password', 'gestionnaire'),
-('Karim Ouazzani', 'ingenieur2@barrage.ma', 'password', 'gestionnaire'),
-('Ahmed Tahiri', 'operateur@barrage.ma', 'password', 'technicien');
+('Mohamed Benali', 'directeur@barrage.ma', '$2b$12$qL2HRDFLk74CNj8RWCdvQe7izBiwKkPPYWJjLnOPNU0HjKpYvRHni', 'admin'),
+('Fatima El Amrani', 'ingenieur1@barrage.ma', '$2b$12$qL2HRDFLk74CNj8RWCdvQe7izBiwKkPPYWJjLnOPNU0HjKpYvRHni', 'gestionnaire'),
+('Karim Ouazzani', 'ingenieur2@barrage.ma', '$2b$12$qL2HRDFLk74CNj8RWCdvQe7izBiwKkPPYWJjLnOPNU0HjKpYvRHni', 'gestionnaire'),
+('Ahmed Tahiri', 'operateur@barrage.ma', '$2b$12$qL2HRDFLk74CNj8RWCdvQe7izBiwKkPPYWJjLnOPNU0HjKpYvRHni', 'technicien');
 
 INSERT INTO Cooperative (nom, surface_agricole, historique_consommation)
 VALUES

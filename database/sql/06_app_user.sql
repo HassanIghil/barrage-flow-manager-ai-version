@@ -1,3 +1,5 @@
+
+
 -- =====================================================
 -- BARRAGE FLOW MANAGER
 -- Fichier : 06_app_user.sql
@@ -16,8 +18,6 @@
 -- Étape 1 : Créer l'utilisateur applicatif
 CREATE USER IF NOT EXISTS 'barrage_app'@'%' IDENTIFIED BY 'AppSecure2024!';
 
--- Étape 2 : Donner UNIQUEMENT les droits nécessaires (principe du moindre privilège)
-GRANT SELECT, INSERT, UPDATE, DELETE ON barrage_flow_db_AI_Version.* TO 'barrage_app'@'%';
-
--- Étape 3 : Appliquer les permissions immédiatement
+GRANT SELECT, INSERT, UPDATE, DELETE, EXECUTE ON barrage_flow_db_AI_Version.* TO 'barrage_app'@'%';
 FLUSH PRIVILEGES;
+
