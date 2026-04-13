@@ -67,7 +67,9 @@ def execute_release(
     
     # Call stored procedure
     try:
-        db.execute(text(f"CALL sp_repartir_eau({id_lacher})"))
+        db.execute(text("CALL sp_repartir_eau(:id)"),
+    {"id": id_lacher}
+    )
         db.commit()
     except Exception as e:
         db.rollback()
