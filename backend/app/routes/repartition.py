@@ -9,6 +9,7 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.repartition import Repartition
 from app.schemas.repartition import RepartitionCreate, RepartitionUpdate, RepartitionResponse
+from app.routes.dependencies import RoleChecker
 
 router = APIRouter(prefix="/api/repartitions", tags=["Repartition"])
 
@@ -68,7 +69,9 @@ def trigger_repartition_procedure(
 def list_repartitions(
     id_lacher: int = None,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(
+    RoleChecker(["Directeur", "directeur", "Admin", "admin"])
+),
 ):
     """
     Liste toutes les répartitions. Filtre optionnel par lâcher (id_lacher).

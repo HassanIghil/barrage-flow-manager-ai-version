@@ -6,6 +6,7 @@ from sqlalchemy import text
 
 from app.core.database import get_db
 from app.core.security import get_current_user
+from app.routes.dependencies import RoleChecker
 
 router = APIRouter(prefix="/api/alerts", tags=["Alerts"])
 
@@ -38,7 +39,9 @@ def get_recent_alerts(
 @router.get("/critical")
 def get_critical_alerts(
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(
+    RoleChecker(["Directeur", "directeur", "Admin", "admin", "Gestionnaire", "gestionnaire"])
+),
 ):
     """
     Retourne uniquement les alertes de type 'niveau_critique', triées par date décroissante.
