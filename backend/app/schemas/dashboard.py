@@ -16,7 +16,14 @@ class RecentActivity(BaseModel):
     description: str
     date: datetime
 
+# Ajouter le nouveau shéma précis pour les alerts
+class AlerteUrgente(BaseModel):      
+    id_alerte: int
+    type: str
+    message: str
+    id_barrage: int
+
 class DashboardResponse(BaseModel):
     stats: DashboardStats
     recent_activities: List[RecentActivity]
-    alertes_urgentes: List[dict]
+    alertes_urgentes: List[AlerteUrgente]  

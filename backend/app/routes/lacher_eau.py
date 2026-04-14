@@ -164,7 +164,9 @@ def execute_release(
 @router.get("/", response_model=list)
 def list_releases(
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(
+    RoleChecker(["Directeur", "directeur", "Gestionnaire", "gestionnaire"])
+),
 ):
     """
     Liste tous les lâchers d'eau avec les infos de l'utilisateur et du barrage.

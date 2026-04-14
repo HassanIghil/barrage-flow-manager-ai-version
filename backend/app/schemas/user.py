@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr , Field
 from app.models.user import UserRole
 
 
@@ -8,9 +8,9 @@ class UserLogin(BaseModel):
 
 
 class UserCreate(BaseModel):
-    nom: str
+    nom: str = Field(..., min_length=2, max_length=100)
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8)   # ← minimum 8 caractères
     role: UserRole
 
 

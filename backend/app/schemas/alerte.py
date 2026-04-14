@@ -8,7 +8,7 @@ class AlerteCreate(BaseModel):
     type: AlerteType
     message: str = Field(..., max_length=500)
     date_: datetime
-    id_barrage: int
+    id_barrage: int = Field(..., gt=0) # accepte les valeurs >0 uniquement 
 
 class AlerteResponse(BaseModel):
     id_alerte: int
