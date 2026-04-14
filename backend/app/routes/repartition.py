@@ -146,7 +146,9 @@ def get_repartition(
 def create_repartition(
     payload: RepartitionCreate,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(
+        RoleChecker(["Directeur", "directeur", "Admin", "admin"])
+    ),
 ):
     """
     Crée une nouvelle répartition de volume d'eau pour une coopérative.
