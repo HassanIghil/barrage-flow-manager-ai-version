@@ -13,6 +13,8 @@ app = FastAPI(
 
 origins = [
     "http://localhost:5173",  # frontend (Vite)
+    "http://localhost:5174",  # frontend (Vite alternate)
+    "http://localhost:5175",  # frontend (Vite alternate)
     "http://localhost:3000",
 ]
 
